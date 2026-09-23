@@ -1,0 +1,59 @@
+
+--add the data to the tables
+create or alter procedure bronze.load_bronze as 
+begin
+
+DECLARE @start_time DATETIME, @end_time DATETIME, @batch_start_time DATETIME, @batch_end_time DATETIME; 
+
+begin try 
+
+print'------Loading data into bronze layer---';
+print'---------';
+
+print'------Loading data into crm_cust_info---';
+TRUNCATE TABLE bronze.crm_cust_info;
+BULK INSERT bronze.crm_cust_info
+FROM '/var/opt/mssql/import/cust_info.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', TABLOCK);
+
+print'------Loading data into crm_prd_info---';
+TRUNCATE TABLE bronze.crm_prd_info;
+BULK INSERT bronze.crm_prd_info
+FROM '/var/opt/mssql/import/prd_info.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', TABLOCK);
+
+print'------Loading data into crm_sales_details---';
+TRUNCATE TABLE bronze.crm_sales_details;
+BULK INSERT bronze.crm_sales_details
+FROM '/var/opt/mssql/import/sales_details.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', TABLOCK);
+
+print'------Loading data into erp_cust_az12---';
+TRUNCATE TABLE bronze.erp_cust_az12;
+BULK INSERT bronze.erp_cust_az12
+FROM '/var/opt/mssql/import/CUST_AZ12.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', TABLOCK);
+
+print'------Loading data into erp_loc_a101---';
+TRUNCATE TABLE bronze.erp_loc_a101;
+BULK INSERT bronze.erp_loc_a101
+FROM '/var/opt/mssql/import/LOC_A101.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', TABLOCK);
+
+print'------Loading data into erp_px_cat_g1v2---';
+TRUNCATE TABLE bronze.erp_px_cat_g1v2;
+BULK INSERT bronze.erp_px_cat_g1v2
+FROM '/var/opt/mssql/import/PX_CAT_G1V2.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', TABLOCK); 
+
+end try
+begin catch
+print'Error Occured while loading data into bronze layer';
+print'Error Number: ' + cast(error_number() as varchar(10));
+print'Error Message: ' + cast(error_message() as varchar(255));
+print'Error staesment: ' + cast(error_state() as varchar(10)); 
+
+end catch
+
+
+end;
